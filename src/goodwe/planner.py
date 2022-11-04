@@ -8,11 +8,29 @@ class HourPlan:
         self.charge_period_minutes = charge_period_minutes
         self.heat_water = heat_water
 
+class Plan:
+    def __init__(self, charge_kwh: float, heat_water: bool):
+        self.charge_kwh = charge_kwh
+        self.heat_water = heat_water
+
 
 class Planner:
-    def __init__(self, energy_prices: EnergyPrices, battery_state: Battery, energy_production_today: float):
-        self.energy_prices = energy_prices
+
+    MINIMAL_MORNING_CONSUMPTION_KWH = 1.0
+
+    def __init__(self, battery_state: Battery, energy_production_today: float):
+        self.battery_state = battery_state
+        self.energy_production_today = energy_production_today
     
-    def get_morning_plan(self) -> list[HourPlan]:
-        return [ HourPlan(1, 20, 55, True)]
+    def get_morning_plan(self) -> Plan:
+
+        charge_kwh = 0.0
+        
+        if (self.battery_state.remaining_charge_kwh < self.MINIMAL_MORNING_CONSUMPTION_KWH):
+            charge_kwh += self.MINIMAL_MORNING_CONSUMPTION_KWH
+
+        return Plan(charge_kwh, False)
+
+    def get_afternoon_plan(self) -> Plan:
+        return Plan(0.0, False)
         
